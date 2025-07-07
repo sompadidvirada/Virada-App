@@ -1,5 +1,6 @@
 import CardButton from "@/components/CardButton";
 import { images, offers } from "@/constants";
+import useAuthStore from "@/store/auth.store";
 import cn from "clsx";
 import { Fragment } from "react";
 import {
@@ -8,12 +9,15 @@ import {
   Pressable,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../globals.css";
 
 export default function Index() {
+  const { user} = useAuthStore()
+
+  console.log("USER:", JSON.stringify(user, null, 2))  
   return (
     <SafeAreaView className="flex-1 bg-white">
       <FlatList

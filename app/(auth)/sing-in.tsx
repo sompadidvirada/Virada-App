@@ -1,5 +1,7 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
+import { singIn } from "@/lib/appwrite";
+import * as Sentry from '@sentry/react-native';
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Text, View } from "react-native";
@@ -13,13 +15,15 @@ const SingIn = () => {
       Alert.alert("Error", "Please enter valid email address & password.");
       return
     }
-
+    
     setIsSubmitting(true);
     try {
-      Alert.alert("success", "User sing ing Successfully!!");
+      await singIn({email: form.email, password: form.password })
       router.replace("/");
     } catch (error) {
-      Alert.alert("Error", error.message);
+      const errorMessage = (error instanceof Error && error.message) ? error.message : 'An unexpected error occurred.';
+      Alert.alert('Error', errorMessage);
+      Sentry.captureException(error)
     } finally {
       setIsSubmitting(false);
     }
