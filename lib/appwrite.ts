@@ -1,12 +1,17 @@
-import { CreateUserParams, SignInParams } from "@/type";
-import { Account, Avatars, Client, Databases, ID, Query } from "react-native-appwrite";
+import { CreateUserParams, GetMenuParams, SignInParams } from "@/type";
+import { Account, Avatars, Client, Databases, ID, Query, Storage } from "react-native-appwrite";
 
 export const appwriteConfig = {
   endpoint: process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT!,
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!,
   platform: "com.virada.virada-app",
   databaseId: "686a47ec001562dbdba9",
+  bucketId:"686b4d400024af92d2be",
   userCollectionId: "686a4844001ed190b66d",
+  categoriesCollectionId:"686b47ab000ece625d66",
+  menuCollectionId: "686b4876002c3fbf4592",
+  customizationCollectionId: "686b4a7100061b06a5be",
+  menuCustomizationCollecttionId: "686b4c18001ebb6df2ea"
 };
 
 export const client = new Client();
@@ -18,6 +23,7 @@ client
 
 export const account = new Account(client);
 export const databases = new Databases(client);
+export const storage = new Storage(client)
 const avatars = new Avatars(client);
 
 export const createUser = async ({
@@ -76,3 +82,36 @@ export const getCurrentUser = async () => {
         throw Error(e as string)
     }
 }
+
+export const getMenu = async ({ category, query }: GetMenuParams) => {
+    try {
+        const queries: string[] = [];
+
+        if(category) queries.push(Query.equal('categories', category));
+        if(query) queries.push(Query.search('name', query));
+
+        const menus = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.menuCollectionId,
+            queries,
+        )
+
+        return menus.documents;
+    } catch (e) {
+        throw new Error(e as string);
+    }
+}
+
+export const getCategories = async () => {
+  try{
+    const categories = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.categoriesCollectionId,
+      
+    )
+    return categories.documents;
+  }catch(err) {
+    throw new Error(err as string)
+  }
+}
+
